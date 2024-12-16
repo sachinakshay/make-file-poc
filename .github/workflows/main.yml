@@ -1,10 +1,17 @@
 name: AWS example workflow
 on:
-  push
-env:
-  BUCKET_NAME : "test-iqindia"
-  AWS_REGION : "us-east-1"
-# permission can be added at job level or workflow level
+  workflow_call:
+    # Required inputs
+    inputs:
+      BUCKET_NAME:
+        description: "bucket name"
+        type: string
+        required: true
+      AWS_REGION:
+        description: "Region name"
+        type: string
+        required: true        
+        
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
@@ -20,9 +27,9 @@ jobs:
         with:
           role-to-assume: "arn:aws:iam::423623853214:role/oidc-github"
           role-session-name: "samplerolesession"
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ inputs.AWS_REGION }}
       
       # Upload a file to AWS s3
       - name: Copy text file to s3
         run: |
-          aws s3 cp ./sachin.txt s3://${{ env.BUCKET_NAME }}/
+          aws s3 cp ./sachin.txt s3://${{ inputs.BUCKET_NAME }}/
